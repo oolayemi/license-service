@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers\Brand;
+
+use App\Actions\Licenses\ChangeLicenseLifecycleAction;
+use App\Actions\Licenses\ListLicensesByEmailAction;
+use App\Actions\Licenses\ProvisionLicenseAction;
+use App\Http\Controllers\Controller;
+use App\Models\License;
+use Illuminate\Http\Request;
+
+class LicenseController extends Controller
+{
+    /**
+     * Provision a license key and licenses for one or more products.
+     */
+    public function provision(
+        Request $request,
+        ProvisionLicenseAction $provisionAction
+    ) {
+        $request->validate([
+            'customer_email' => 'required|email',
+            'product_codes' => 'required|array',
+            'expires_at' => 'nullable|date',
+            'max_seats' => 'nullable|integer|min:1',
+        ]);
+
+        $brand = $request->attributes->get('brand'); // from api_token middleware
+
+        $licenseKey = $provisionAction->execute(
+            $brand,
+            $request->input('customer_email'),
+            $request->input('product_codes'),
+            $request->input('expires_at'),
+            $request->input('max_seats')
+        );
+
+        return response()->json([
+            'license_key' => $licenseKey->key,
+            'customer_email' => $licenseKey->customer_email,
+            'licenses' => $licenseKey->licenses->map(fn ($l) => [
+                'product_code' => $l->product->code,
+                'product_name' => $l->product->name,
+                'status' => $l->status->value,
+                'expires_at' => optional($l->expires_at)->toDateTimeString(),
+                'max_seats' => $l->max_seats,
+            ]),
+        ]);
+    }
+
+    /**
+     * Change license lifecycle: renew, suspend, resume, cancel
+     */
+    public function changeLifecycle(
+        Request $request,
+        License $license,
+        ChangeLicenseLifecycleAction $action
+    ) {
+        $request->validate([
+            'action' => 'required|in:renew,suspend,resume,cancel',
+            'renew_days' => 'nullable|integer|min:1',
+        ]);
+
+        $updatedLicense = $action->execute(
+            $license,
+            $request->input('action'),
+            $request->input('renew_days')
+        );
+
+        return response()->json([
+            'license_id' => $updatedLicense->id,
+            'status' => $updatedLicense->status->value,
+            'expires_at' => optional($updatedLicense->expires_at)->toDateTimeString(),
+        ]);
+    }
+
+    /**
+     * List all licenses by customer email (across all licenses for this brand)
+     */
+    public function listByEmail(
+        Request $request,
+        ListLicensesByEmailAction $action
+    ) {
+        $request->validate([
+            'customer_email' => 'required|email',
+        ]);
+
+        $brand = $request->attributes->get('brand'); // from api_token middleware
+
+        $licenses = $action->execute($brand, $request->input('customer_email'));
+
+        return response()->json([
+            'customer_email' => $request->input('customer_email'),
+            'licenses' => $licenses,
+        ]);
+    }
+}
