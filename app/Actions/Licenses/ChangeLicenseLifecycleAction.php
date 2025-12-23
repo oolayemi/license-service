@@ -20,7 +20,7 @@ class ChangeLicenseLifecycleAction
     /**
      * Update license lifecycle state.
      *
-     * @param  string  $action  'renew'|'suspend'|'resume'|'cancel'
+     * @param  string  $action  options include renew|suspend|resume|cancel
      * @param  int|null  $renewDays  Number of days to extend if action is 'renew'
      *
      * @throws \InvalidArgumentException
@@ -96,9 +96,7 @@ class ChangeLicenseLifecycleAction
      */
     protected function suspend(License $license): void
     {
-        $license->update([
-            'status' => LicenseStatus::SUSPENDED,
-        ]);
+        $license->update(['status' => LicenseStatus::SUSPENDED]);
     }
 
     /**
@@ -110,9 +108,7 @@ class ChangeLicenseLifecycleAction
             throw new \InvalidArgumentException('Only suspended licenses can be resumed');
         }
 
-        $license->update([
-            'status' => LicenseStatus::VALID,
-        ]);
+        $license->update(['status' => LicenseStatus::VALID]);
     }
 
     /**
@@ -120,8 +116,6 @@ class ChangeLicenseLifecycleAction
      */
     protected function cancel(License $license): void
     {
-        $license->update([
-            'status' => LicenseStatus::CANCELLED,
-        ]);
+        $license->update(['status' => LicenseStatus::CANCELLED]);
     }
 }

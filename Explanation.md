@@ -1,299 +1,260 @@
-License Service – Explanation
-1. Problem & Requirements (In My Own Words)
+# License Service – Architecture & Implementation Explanation
 
-group.one operates multiple WordPress-focused brands (WP Rocket, RankMath, Imagify, etc.) that historically managed licenses independently. As the ecosystem grows, this leads to duplication, inconsistent entitlements, and difficulty understanding what products a customer can access across brands.
+## 1. Problem Statement
 
-The goal of this project is to build a centralized License Service that:
+group.one operates multiple WordPress-focused brands (WP Rocket, RankMath, Imagify, BackWPup, etc.) that historically manage licenses independently. As the ecosystem grows, there is a need for a **centralized License Service** that acts as the **single source of truth** for license lifecycle and entitlements, while still allowing each brand to independently manage users, subscriptions, and billing.
 
-Acts as the single source of truth for licenses and entitlements
+This License Service must:
+- Be multi-tenant (support multiple brands)
+- Allow brands to provision and manage licenses
+- Allow end-user products (plugins, apps, CLIs) to activate and validate licenses
+- Be scalable, observable, and production-ready
+- Expose clear APIs for both brand systems and products
 
-Supports multi-tenancy across brands and products
+The goal of this assessment is to demonstrate **backend system design, API modeling, and clean implementation**, not to build a full commercial system.
 
-Allows brand systems to provision and manage licenses
+---
 
-Allows end-user products (plugins, apps, CLIs) to activate and validate licenses
+## 2. Architecture & Design
 
-Is designed for scalability, observability, and extensibility
+### 2.1 High-Level Architecture
+Brand Systems ───────▶ License Service ◀─────── End-User Products
+(Billing, Users) (Laravel API) (Plugins / Apps)
 
-The service is API-only, with no UI, and focuses on correctness, clarity, and production-readiness.
+├─ Brands
+├─ Products
+├─ License Keys
+├─ Licenses
+└─ Activations (Seats)
 
-2. Architecture & Design
-   2.1 High-Level Architecture
-   Brand Systems ──▶ License Service ◀── End-User Products
-   │                   │
-   │                   ├── License Keys
-   │                   ├── Licenses (per product)
-   │                   └── Activations (seats / instances)
 
+- **Brand systems** integrate with the License Service to provision and manage licenses.
+- **End-user products** call the License Service to activate, validate, and deactivate licenses.
+- The License Service is the **single source of truth** for license state and entitlements.
 
-Brand systems manage users, billing, and subscriptions
+---
 
-License Service manages license lifecycle and entitlements
+### 2.2 Multi-Tenancy Model
 
-End-user products call the service to activate and validate usage
+Multi-tenancy is modeled explicitly at the **data level**:
 
-2.2 Core Domain Model
-Entity	Purpose
-Brand	Represents a tenant (e.g. WP Rocket, RankMath)
-Product	A licensable product belonging to a brand
-LicenseKey	A single key shared across multiple licenses
-License	Grants access to one product
-Activation	Represents a seat or instance usage
-Relationships
+- `Brand`
+    - Owns products
+    - Owns license keys
+    - Authenticates via `api_token`
 
-Brand → has many Products
+- `Product`
+    - Belongs to exactly one brand
+    - Identified by a unique `code` (e.g. `RANKMATH`, `WP_ROCKET`)
 
-Brand → has many LicenseKeys
+- `LicenseKey`
+    - Scoped to one brand
+    - Shared across multiple licenses within that brand
+    - Linked to a `customer_email`
 
-LicenseKey → has many Licenses
+- `License`
+    - Represents entitlement to **one product**
+    - Has lifecycle state and expiration
 
-License → belongs to one Product
+This ensures:
+- Brands cannot see or manage other brands’ licenses
+- License keys are reusable **within** a brand but never across brands
 
-License → has many Activations
+---
 
-2.3 Multi-Tenancy Strategy
+### 2.3 Core Domain Model
 
-Each request is scoped by Brand
+| Entity | Purpose |
+|------|--------|
+| Brand | Tenant boundary, authentication |
+| Product | Sellable product or addon |
+| LicenseKey | Key shared by multiple licenses |
+| License | Entitlement for one product |
+| Activation | Seat / instance activation |
 
-Brand-facing APIs require a brand API token
+**Relationships**
+- Brand → Products
+- Brand → LicenseKeys
+- LicenseKey → Licenses
+- License → Activations
 
-License keys are brand-specific
+---
 
-No data is shared across brands unless explicitly designed
+### 2.4 API Design
 
-This avoids accidental cross-brand data leakage and keeps tenancy boundaries clear.
+The system exposes **two API surfaces**:
 
-2.4 API Design
-Brand-Facing APIs
+#### Brand-Facing API
+- Authenticated using `api_token`
+- Used by internal brand systems
 
-Provision licenses
+#### Product-Facing API
+- Used by plugins / apps
+- Rate-limited and observable
+- Stateless requests
 
-Change license lifecycle
+---
 
-List licenses by customer email
+## 3. Trade-Offs & Design Decisions
 
-Authenticated using a brand API token.
+### 3.1 LicenseKey vs License Separation
 
-Product-Facing APIs
+**Chosen approach**
+- One `LicenseKey` per customer per brand
+- Multiple `Licenses` per key (one per product)
 
-Activate license
+**Why**
+- Matches real-world SaaS behavior (addons, bundles)
+- Supports scenarios like RankMath + Content AI under one key
+- Allows independent lifecycle per product
 
-Check license status
+**Alternative**
+- One license per key → rejected due to inflexibility
 
-Deactivate seat
+---
 
-Designed to be simple, fast, and cacheable.
+### 3.2 Seat Management
 
-2.5 Observability & Operability
+**Current**
+- Seat model (`Activation`) fully designed
+- Core activation & deactivation implemented
 
-Tracer
+**Trade-off**
+- No advanced concurrency handling (e.g. distributed locks)
 
-Trace ID per request
+**Future**
+- Redis-backed seat counters
+- Optimistic locking on activation creation
 
-Span-based logging for actions
+---
 
-Metrics
+### 3.3 Authentication Choices
 
-License provisioned
+**Brand API**
+- Token-based (`api_token`)
+- Simple and sufficient for internal services
 
-License activated
+**Product API**
+- No auth for assessment scope
+- Protected by rate limiting
 
-Activation failures
+**Future**
+- Signed product tokens
+- mTLS or OAuth for products
 
-Rate limiting
+---
 
-Product-facing endpoints protected per license key + product
+### 3.4 Observability
 
-Structured logging
+**Implemented**
+- Structured tracing (`Tracer`)
+- Spans for critical actions
+- Metrics hooks
 
-JSON-friendly logs with context
+**Not Implemented**
+- Distributed tracing backend (e.g. OpenTelemetry)
 
-This allows easy integration with systems like Datadog, New Relic, or ELK.
+---
 
-3. Trade-offs & Decisions
-   3.1 Technology Choices
-   Choice	Reason
-   Laravel	Strong ecosystem, rapid development, clean architecture
-   MySQL	Widely supported, easy local & CI setup
-   Pest	Readable, expressive testing
-   Laravel Pint	Official linter, zero-config
-   3.2 Alternatives Considered
-   Separate License Key per Product
+## 4. User Stories Coverage
 
-❌ Rejected
+| User Story | Status | Notes |
+|----------|--------|------|
+| US1 – Provision license | ✅ Implemented | `ProvisionLicenseAction` |
+| US2 – Change lifecycle | ✅ Implemented | Suspend / resume / cancel |
+| US3 – Activate license | ✅ Implemented | Seat-aware |
+| US4 – Check license status | ✅ Implemented | Returns entitlements |
+| US5 – Deactivate seat | ✅ Implemented | Frees activation |
+| US6 – List licenses by email | ✅ Implemented | Brand-only |
 
-Makes add-ons (e.g. Content AI) harder to manage
+All **recommended core stories** are fully implemented.
 
-Worse user experience
+---
 
-Fully Event-Driven Architecture
+## 5. How to Run Locally
 
-❌ Overkill for assessment scope
+### 5.1 Requirements
 
-Added complexity without immediate benefit
+- PHP 8.2+
+- Composer
+- MySQL or PostgreSQL
+- Node.js (optional, for tooling)
 
-External Rate Limiter (API Gateway)
+---
 
-❌ Out of scope
+### 5.2 Setup Steps
 
-In-app rate limiting sufficient for now
+```bash
+git clone https://github.com/your-username/license-service.git
+cd license-service
 
-3.3 Scaling Plan
+composer install
+cp .env.example .env
+php artisan key:generate
 
-If this service grows:
+php artisan migrate --seed
+php artisan serve
+```
+### 5.3 Environment Variables
 
-Move activations & checks to Redis-backed cache
-
-Add read replicas
-
-Introduce event-driven updates for lifecycle changes
-
-Add JWT-based product authentication
-
-Introduce async seat cleanup jobs
-
-The current design intentionally supports these evolutions.
-
-4. User Stories Coverage
-   ✅ US1 – Brand can provision a license
-
-Implemented
-
-ProvisionLicenseAction
-
-Creates license key
-
-Creates licenses per product
-
-Supports add-ons under same key
-
-✅ US2 – Brand can change license lifecycle
-
-Implemented
-
-ChangeLicenseLifecycleAction
-
-Supports suspend, resume, cancel, renew
-
-✅ US3 – End-user product can activate a license
-
-Implemented
-
-ActivateLicenseAction
-
-Creates activation per instance
-
-Seat limit enforced via SeatManager
-
-✅ US4 – User can check license status
-
-Implemented
-
-CheckLicenseStatusAction
-
-Returns:
-
-License validity
-
-Product entitlements
-
-Seat usage
-
-✅ US5 – Deactivate a seat
-
-Implemented
-
-DeactivateSeatAction
-
-Frees activation slot
-
-✅ US6 – List licenses by customer email
-
-Implemented
-
-ListLicensesByEmailAction
-
-Brand-authenticated only
-
-No end-user access
-
-5. How to Run Locally
-   5.1 Setup
-   git clone <repo>
-   cd license-service
-   composer install
-   cp .env.example .env
-   php artisan key:generate
-   php artisan migrate
-   php artisan db:seed
-   php artisan serve
-
-5.2 Environment Variables
-APP_ENV=local
+```bash
 DB_CONNECTION=mysql
 DB_DATABASE=license_service
 DB_USERNAME=root
 DB_PASSWORD=
 
-5.3 Sample Requests
-Provision License
-curl -X POST /api/brand/licenses \
--H "Authorization: Bearer BRAND_API_TOKEN" \
--d '{"customer_email":"user@example.com","product_codes":["RANKMATH"]}'
+CACHE_DRIVER=database
+QUEUE_CONNECTION=sync
+```
 
-Activate License
-curl -X POST /api/product/license/activate \
--d '{"license_key":"XXXX","product_code":"RANKMATH","instance_id":"site_1"}'
+### 5.4 Sample Requests
 
-Check Status
-curl /api/product/license/status?license_key=XXXX
+#### Provision License (Brand)
+```bash
+curl -X POST http://localhost:8000/api/brand/licenses \
+  -H "Authorization: Bearer BRAND_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_email": "user@example.com",
+    "product_codes": ["RANKMATH", "CONTENT_AI"],
+    "expires_at": "2026-12-31"
+  }'
+```
 
+#### Activate License (Product)
+```bash
+curl -X POST http://localhost:8000/api/product/license/activate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "license_key": "XXXX-XXXX",
+    "product_code": "RANKMATH",
+    "instance_id": "site_123"
+  }'
+```
 
-Postman collection is included in the repository.
+## 6. Testing & CI
+#### Testing
+- Pest for unit and feature tests
+- Coverage for actions, models, and APIs
 
-6. Code Quality & CI
+```bash
+php artisan test
+```
 
-Laravel Pint enforces coding standards
+#### Linting
+- Laravel Pint
 
-Pest covers unit & integration tests
+```bash
+./vendor/bin/pint
+```
 
-GitHub Actions CI
+#### CI
+- GitHub Actions
+- Runs Pint + Pest on every PR and commit to main
 
-Runs lint + tests on every PR & commit
+## 7. Known Limitations & Next Steps
+### Limitations
+- No real-time eventing (webhooks)
+- No advanced fraud detection
+- No UI dashboard
 
-Fully automated quality gate
-
-7. Known Limitations & Next Steps
-   Limitations
-
-Seat management is synchronous
-
-No async event propagation
-
-No per-product auth tokens yet
-
-Next Steps
-
-Add Redis caching
-
-Introduce async event bus
-
-Add audit logs
-
-Introduce usage analytics
-
-Add OpenTelemetry exporter
-
-Final Notes
-
-This solution prioritizes:
-
-Correctness
-
-Clarity
-
-Production realism
-
-Extensibility
-
-While not all future features are implemented, the architecture intentionally supports growth, and all core requirements are fully satisfied.

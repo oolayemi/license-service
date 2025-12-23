@@ -40,7 +40,7 @@ class ActivateLicenseAction
             // 1. Validate the license and product
             $license = $this->licenseValidator->validate($licenseKey, $productCode);
 
-            // 2. Check seat availability
+            // 2. Check if a seat is available
             if (! $this->seatManager->canActivate($license)) {
                 Metrics::event('license.activation.failed', [
                     'license_id' => $license->id,

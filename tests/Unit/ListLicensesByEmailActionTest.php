@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(
     Tests\TestCase::class,
-    RefreshDatabase::class,);
+    RefreshDatabase::class, );
 
 it('lists licenses by email for a brand', function () {
     $brand = Brand::factory()->create();

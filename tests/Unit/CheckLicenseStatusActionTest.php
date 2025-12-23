@@ -19,7 +19,7 @@ it('returns license status and entitlements', function () {
         'product_id' => $product->id,
     ]);
 
-//    dd($license->toArray());
+    //    dd($license->toArray());
 
     $action = resolve(CheckLicenseStatusAction::class);
     $status = $action->execute($licenseKey->key);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Brand;
 use App\Actions\Licenses\ChangeLicenseLifecycleAction;
 use App\Actions\Licenses\ListLicensesByEmailAction;
 use App\Actions\Licenses\ProvisionLicenseAction;
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\License;
 use Illuminate\Http\Request;
@@ -14,10 +15,8 @@ class LicenseController extends Controller
     /**
      * Provision a license key and licenses for one or more products.
      */
-    public function provision(
-        Request $request,
-        ProvisionLicenseAction $provisionAction
-    ) {
+    public function provision(Request $request, ProvisionLicenseAction $provisionAction)
+    {
         $request->validate([
             'customer_email' => 'required|email',
             'product_codes' => 'required|array',
@@ -25,27 +24,32 @@ class LicenseController extends Controller
             'max_seats' => 'nullable|integer|min:1',
         ]);
 
-        $brand = $request->attributes->get('brand'); // from api_token middleware
+        try {
 
-        $licenseKey = $provisionAction->execute(
-            $brand,
-            $request->input('customer_email'),
-            $request->input('product_codes'),
-            $request->input('expires_at'),
-            $request->input('max_seats')
-        );
+            $brand = $request->attributes->get('brand'); // this comes from the brand api token middleware
 
-        return response()->json([
-            'license_key' => $licenseKey->key,
-            'customer_email' => $licenseKey->customer_email,
-            'licenses' => $licenseKey->licenses->map(fn ($l) => [
-                'product_code' => $l->product->code,
-                'product_name' => $l->product->name,
-                'status' => $l->status->value,
-                'expires_at' => optional($l->expires_at)->toDateTimeString(),
-                'max_seats' => $l->max_seats,
-            ]),
-        ]);
+            $licenseKey = $provisionAction->execute(
+                $brand,
+                $request->input('customer_email'),
+                $request->input('product_codes'),
+                $request->input('expires_at'),
+                $request->input('max_seats')
+            );
+
+            return ApiResponse::success([
+                'license_key' => $licenseKey->key,
+                'customer_email' => $licenseKey->customer_email,
+                'licenses' => $licenseKey->licenses->map(fn ($l) => [
+                    'product_code' => $l->product->code,
+                    'product_name' => $l->product->name,
+                    'status' => $l->status->value,
+                    'expires_at' => optional($l->expires_at)->toDateTimeString(),
+                    'max_seats' => $l->max_seats,
+                ]),
+            ]);
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 
     /**
@@ -61,17 +65,22 @@ class LicenseController extends Controller
             'renew_days' => 'nullable|integer|min:1',
         ]);
 
-        $updatedLicense = $action->execute(
-            $license,
-            $request->input('action'),
-            $request->input('renew_days')
-        );
+        try {
+            $updatedLicense = $action->execute(
+                $license,
+                $request->input('action'),
+                $request->input('renew_days')
+            );
 
-        return response()->json([
-            'license_id' => $updatedLicense->id,
-            'status' => $updatedLicense->status->value,
-            'expires_at' => optional($updatedLicense->expires_at)->toDateTimeString(),
-        ]);
+            return ApiResponse::success([
+                'license_id' => $updatedLicense->id,
+                'status' => $updatedLicense->status->value,
+                'expires_at' => optional($updatedLicense->expires_at)->toDateTimeString(),
+            ]);
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 
     /**
@@ -85,13 +94,16 @@ class LicenseController extends Controller
             'customer_email' => 'required|email',
         ]);
 
-        $brand = $request->attributes->get('brand'); // from api_token middleware
+        try {
+            $brand = $request->attributes->get('brand'); // from api_token middleware
+            $licenses = $action->execute($brand, $request->input('customer_email'));
 
-        $licenses = $action->execute($brand, $request->input('customer_email'));
-
-        return response()->json([
-            'customer_email' => $request->input('customer_email'),
-            'licenses' => $licenses,
-        ]);
+            return ApiResponse::success([
+                'customer_email' => $request->input('customer_email'),
+                'licenses' => $licenses,
+            ]);
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 }

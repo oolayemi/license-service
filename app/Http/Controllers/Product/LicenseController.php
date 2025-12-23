@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Product;
 use App\Actions\Licenses\ActivateLicenseAction;
 use App\Actions\Licenses\CheckLicenseStatusAction;
 use App\Actions\Licenses\DeactivateSeatAction;
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -23,17 +24,23 @@ class LicenseController extends Controller
             'instance_id' => 'nullable|string',
         ]);
 
-        $activation = $action->execute(
-            $request->input('license_key'),
-            $request->input('product_code'),
-            $request->input('instance_id')
-        );
+        try {
 
-        return response()->json([
-            'activation_id' => $activation->id,
-            'activated_at' => $activation->activated_at->toDateTimeString(),
-            'instance_identifier' => $activation->instance_identifier,
-        ]);
+            $activation = $action->execute(
+                $request->input('license_key'),
+                $request->input('product_code'),
+                $request->input('instance_id')
+            );
+
+            return ApiResponse::success([
+                'activation_id' => $activation->id,
+                'activated_at' => $activation->activated_at->toDateTimeString(),
+                'instance_identifier' => $activation->instance_identifier,
+            ]);
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 
     /**
@@ -47,9 +54,13 @@ class LicenseController extends Controller
             'license_key' => 'required|string',
         ]);
 
-        $status = $action->execute($request->input('license_key'));
+        try {
+            $status = $action->execute($request->input('license_key'));
 
-        return response()->json($status);
+            return ApiResponse::success($status);
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 
     /**
@@ -63,11 +74,15 @@ class LicenseController extends Controller
             'activation_id' => 'required|string',
         ]);
 
-        $activation = $action->execute($request->input('activation_id'));
+        try {
+            $activation = $action->execute($request->input('activation_id'));
 
-        return response()->json([
-            'activation_id' => $activation->id,
-            'deactivated_at' => $activation->deactivated_at->toDateTimeString(),
-        ]);
+            return ApiResponse::success([
+                'activation_id' => $activation->id,
+                'deactivated_at' => $activation->deactivated_at->toDateTimeString(),
+            ]);
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+        }
     }
 }

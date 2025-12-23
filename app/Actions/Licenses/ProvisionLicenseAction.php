@@ -31,6 +31,8 @@ class ProvisionLicenseAction
             'product_codes' => $productCodes,
         ]);
 
+        //        dd($brand->toArray(), $customerEmail, $productCodes, $expiresAt, $maxSeats);
+
         try {
             return DB::transaction(function () use ($brand, $customerEmail, $productCodes, $expiresAt, $maxSeats) {
                 // 1. Check if a license key already exists for this brand & customer
