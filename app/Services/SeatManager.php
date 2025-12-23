@@ -28,7 +28,7 @@ class SeatManager
     public function activate(License $license, string $instanceIdentifier): Activation
     {
         if (! $this->canActivate($license)) {
-            throw new SeatLimitExceededException("Seats limit exceeded");
+            throw new SeatLimitExceededException('Seats limit exceeded');
         }
 
         return Activation::create([

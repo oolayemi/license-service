@@ -46,7 +46,7 @@ class ActivateLicenseAction
                     'license_id' => $license->id,
                     'reason' => 'seat_limit_exceeded',
                 ]);
-                throw new SeatLimitExceededException("Seats limit exceeded");
+                throw new SeatLimitExceededException('Seats limit exceeded');
             }
 
             // 3. Persist activation
