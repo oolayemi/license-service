@@ -18,5 +18,5 @@ it('lists licenses by email via API', function () {
     ]);
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['customer_email', 'licenses']);
+        ->assertJsonStructure(['success', 'message', 'data' => ['customer_email', 'licenses'], 'errors']);
 });

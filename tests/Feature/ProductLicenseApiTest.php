@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 it('can activate license via API', function () {
     $licenseKey = LicenseKey::factory()->create();
     $product = Product::factory()->create(['brand_id' => $licenseKey->brand_id]);
-    $license = License::factory()->create([
+    License::factory()->create([
         'license_key_id' => $licenseKey->id,
         'product_id' => $product->id,
     ]);
@@ -22,18 +22,18 @@ it('can activate license via API', function () {
     ]);
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['activation_id', 'activated_at', 'instance_identifier']);
+        ->assertJsonStructure(['success', 'message', 'data' => ['activation_id', 'activated_at', 'instance_identifier'], 'errors']);
 });
 
 it('can check license status via API', function () {
     $licenseKey = LicenseKey::factory()->create();
     $product = Product::factory()->create(['brand_id' => $licenseKey->brand_id]);
-    $license = License::factory()->create([
+    License::factory()->create([
         'license_key_id' => $licenseKey->id,
         'product_id' => $product->id,
     ]);
 
     $response = $this->getJson('/api/product/license/status?license_key='.$licenseKey->key);
     $response->assertStatus(200)
-        ->assertJsonStructure(['license_key', 'licenses']);
+        ->assertJsonStructure(['success', 'message', 'data' => ['license_key', 'licenses'], 'errors']);
 });
