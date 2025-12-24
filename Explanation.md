@@ -255,6 +255,5 @@ php artisan test
 ## 7. Known Limitations & Next Steps
 ### Limitations
 - No real-time eventing (webhooks)
-- No advanced fraud detection
 - No UI dashboard
 
