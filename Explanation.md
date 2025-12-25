@@ -18,8 +18,7 @@ The goal of this assessment is to demonstrate **backend system design, API model
 ## 2. Architecture & Design
 
 ### 2.1 High-Level Architecture
-Brand Systems ───────▶ License Service ◀─────── End-User Products
-(Billing, Users) (Laravel API) (Plugins / Apps)
+Brand Systems (Billing, Users) ───────▶ License Service (Laravel API) ◀─────── End-User Products (Plugins / Apps)
 
     ├─ Brands
     ├─ Products
@@ -176,15 +175,15 @@ All **recommended core stories** are fully implemented.
 
 - PHP 8.2+
 - Composer
-- MySQL or PostgreSQL
-- Node.js (optional, for tooling)
+- PostgreSQL (or MySQL)
+- Node.js (optional)
 
 ---
 
 ### 5.2 Setup Steps
 
 ```bash
-git clone https://github.com/your-username/license-service.git
+git clone https://github.com/oolayemi/license-service.git
 cd license-service
 
 composer install
@@ -197,10 +196,10 @@ php artisan serve
 ### 5.3 Environment Variables
 
 ```bash
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_DATABASE=license_service
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
 
 CACHE_DRIVER=database
 QUEUE_CONNECTION=sync
@@ -263,4 +262,9 @@ All checks run automatically via GitHub Actions on every pull request and push t
 ### Limitations
 - No real-time eventing (webhooks)
 - No UI dashboard
+
+### Next Steps
+- Redis-backed rate limiting & seats
+- Webhooks for brand systems
+- License usage analytics
 
