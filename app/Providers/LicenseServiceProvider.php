@@ -50,16 +50,11 @@ class LicenseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(LicenseValidationService::class, function ($app) {
-            return new LicenseValidationService(
-                $app->make(LicenseRepository::class),
-                $app->make(ActivationRepository::class)
-            );
+            return new LicenseValidationService();
         });
 
         $this->app->singleton(SeatManager::class, function ($app) {
-            return new SeatManager(
-                $app->make(ActivationRepository::class)
-            );
+            return new SeatManager();
         });
     }
 

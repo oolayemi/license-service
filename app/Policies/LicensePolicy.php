@@ -97,6 +97,6 @@ class LicensePolicy
         LicenseKey $licenseKey,
         License $license
     ): bool {
-        return $license->license_key_id === $licenseKey->id;
+        return $license->license_key_id == $licenseKey->id;
     }
 }

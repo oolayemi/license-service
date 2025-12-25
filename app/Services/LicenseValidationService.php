@@ -17,6 +17,8 @@ class LicenseValidationService
      * @throws LicenseNotFoundException
      * @throws LicenseExpiredException
      * @throws LicenseSuspendedException
+     *
+     * @returns License
      */
     public function validate(
         string $licenseKeyValue,
@@ -31,6 +33,7 @@ class LicenseValidationService
             throw new LicenseNotFoundException('License key not found.');
         }
 
+        /** @var License|null $license */
         $license = $licenseKey->licenses
             ->firstWhere('product.code', $productCode);
 

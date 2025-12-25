@@ -8,12 +8,14 @@ use App\Actions\Licenses\ProvisionLicenseAction;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\License;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LicenseController extends Controller
 {
     /**
      * Provision a license key and licenses for one or more products.
+     * @return JsonResponse
      */
     public function provision(Request $request, ProvisionLicenseAction $provisionAction)
     {
@@ -48,12 +50,13 @@ class LicenseController extends Controller
                 ]),
             ]);
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 
     /**
      * Change license lifecycle: renew, suspend, resume, cancel
+     * @return JsonResponse
      */
     public function changeLifecycle(
         Request $request,
@@ -79,12 +82,13 @@ class LicenseController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 
     /**
      * List all licenses by customer email (across all licenses for this brand)
+     * @return JsonResponse
      */
     public function listByEmail(
         Request $request,
@@ -103,7 +107,7 @@ class LicenseController extends Controller
                 'licenses' => $licenses,
             ]);
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 }

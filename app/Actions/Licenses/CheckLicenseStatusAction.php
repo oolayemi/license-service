@@ -5,6 +5,8 @@ namespace App\Actions\Licenses;
 use App\Models\LicenseKey;
 use App\Observability\Metrics;
 use App\Observability\Tracer;
+use Illuminate\Support\Collection;
+use Throwable;
 
 class CheckLicenseStatusAction
 {
@@ -12,6 +14,23 @@ class CheckLicenseStatusAction
 
     /**
      * Check the status and entitlements of a license key.
+     *
+     * @return array{
+     *     license_key: string,
+     *     customer_email: string|null,
+     *     licenses: Collection<int, array{
+     *         license_id: int,
+     *         product_code: string,
+     *         product_name: string,
+     *         status: string,
+     *         expires_at: string|null,
+     *         max_seats: int|null,
+     *         active_seats: int,
+     *         remaining_seats: int|null,
+     *         is_usable: bool
+     *     }>
+     * }
+     * @throws Throwable
      */
     public function execute(string $licenseKeyValue): array
     {
@@ -55,7 +74,7 @@ class CheckLicenseStatusAction
                 'customer_email' => $licenseKey->customer_email,
                 'licenses' => $licensesData,
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Tracer::endSpan('license.status.check', [
                 'error' => $e->getMessage(),
             ]);

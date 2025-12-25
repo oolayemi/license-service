@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - app
+        - routes
+
+    excludePaths:
+        - vendor
+        - storage
+        - bootstrap/cache
+
+    ignoreErrors:
+        # Laravel magic properties (handled at runtime)
+        - '#Property .* does not exist#'
+
+        # Pest helper functions
+        - '#Call to an undefined function test#'
+        - '#Call to an undefined function it#'

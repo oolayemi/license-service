@@ -77,6 +77,8 @@ class ActivationRepository
 
     /**
      * List all active activations for a license.
+     *
+     * @return Collection<int, Activation>
      */
     public function listActive(License $license): Collection
     {

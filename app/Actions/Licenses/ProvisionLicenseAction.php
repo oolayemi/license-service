@@ -9,6 +9,7 @@ use App\Models\LicenseKey;
 use App\Models\Product;
 use App\Observability\Metrics;
 use App\Observability\Tracer;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Throwable;
@@ -18,20 +19,18 @@ class ProvisionLicenseAction
     /**
      * Provision licenses for a customer email and one or more products.
      *
-     * @param  array  $productCodes  Array of product codes to provision licenses for
-     * @param  \DateTime|string|null  $expiresAt
+     * @param  array<string>  $productCodes  Array of product codes to provision licenses for
+     * @param DateTime|string|null $expiresAt
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function execute(Brand $brand, string $customerEmail, array $productCodes, $expiresAt = null, ?int $maxSeats = null): LicenseKey
+    public function execute(Brand $brand, string $customerEmail, array $productCodes, DateTime|string $expiresAt = null, ?int $maxSeats = null): LicenseKey
     {
         Tracer::startSpan('license.provision', [
             'brand_id' => $brand->id,
             'customer_email' => $customerEmail,
             'product_codes' => $productCodes,
         ]);
-
-        //        dd($brand->toArray(), $customerEmail, $productCodes, $expiresAt, $maxSeats);
 
         try {
             return DB::transaction(function () use ($brand, $customerEmail, $productCodes, $expiresAt, $maxSeats) {

@@ -4,6 +4,7 @@ namespace App\Actions\Licenses;
 
 use App\Exceptions\SeatLimitExceededException;
 use App\Models\Activation;
+use App\Models\License;
 use App\Observability\Metrics;
 use App\Observability\Tracer;
 use App\Repositories\ActivationRepository;

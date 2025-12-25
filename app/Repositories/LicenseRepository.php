@@ -65,6 +65,8 @@ class LicenseRepository
 
     /**
      * Retrieve all licenses attached to a license key.
+     *
+     * @return Collection<int, License>
      */
     public function getLicensesForKey(LicenseKey $licenseKey): Collection
     {
@@ -121,6 +123,8 @@ class LicenseRepository
      * across all brands.
      *
      * (Admin / brand-only)
+     *
+     * @return Collection<int, License>
      */
     public function listLicensesByEmail(string $email): Collection
     {
