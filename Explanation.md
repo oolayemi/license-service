@@ -58,6 +58,8 @@ This ensures:
 - Brands cannot see or manage other brands’ licenses
 - License keys are reusable **within** a brand but never across brands
 
+> Multi-tenancy is fully designed at the database and API level. Production-level scaling strategies (database sharding, caching, async processing) are documented in the trade-offs section but not implemented.
+
 ---
 
 ### 2.3 Core Domain Model
@@ -116,6 +118,8 @@ The system exposes **two API surfaces**:
 **Current**
 - Seat model (`Activation`) fully designed
 - Core activation & deactivation implemented
+> Note: The seat/activation system is fully designed, including data model (`Activation`), flows, and API.  
+> For this assessment, the implementation supports basic activation/deactivation, but advanced concurrency and distributed enforcement are not implemented. These are outlined in the scaling plan.
 
 **Trade-off**
 - No advanced concurrency handling (e.g. distributed locks)
@@ -150,7 +154,7 @@ The system exposes **two API surfaces**:
 - Metrics hooks
 
 **Not Implemented**
-- Distributed tracing backend (e.g. OpenTelemetry)
+- Tracing and structured logging (`Tracer`) are implemented. A full production-grade observability stack (e.g., OpenTelemetry, dashboards) is designed but not fully implemented.
 
 ---
 
