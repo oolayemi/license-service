@@ -10,7 +10,7 @@ class Tracer
     protected static ?string $traceId = null;
 
     /**
-     * @var array<string>
+     * @var array<string|float>
      */
     protected static array $spans = [];
 
