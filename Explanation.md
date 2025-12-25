@@ -21,12 +21,11 @@ The goal of this assessment is to demonstrate **backend system design, API model
 Brand Systems ───────▶ License Service ◀─────── End-User Products
 (Billing, Users) (Laravel API) (Plugins / Apps)
 
-├─ Brands
-├─ Products
-├─ License Keys
-├─ Licenses
-└─ Activations (Seats)
-
+    ├─ Brands
+    ├─ Products
+    ├─ License Keys
+    ├─ Licenses
+    └─ Activations (Seats)
 
 - **Brand systems** integrate with the License Service to provision and manage licenses.
 - **End-user products** call the License Service to activate, validate, and deactivate licenses.
