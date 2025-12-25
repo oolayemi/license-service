@@ -262,7 +262,29 @@ composer analyse
 
 All checks run automatically via GitHub Actions on every pull request and push to `main`.
 
-## 7. Known Limitations & Next Steps
+## 7. Docker Architecture
+### Running the project with Docker
+#### 1. Build and start containers
+```bash
+docker compose up -d --build
+```
+#### 2. Run database migrations
+```bash
+docker compose exec app php artisan migrate
+```
+#### (Optional) Seed demo data if available:
+```bash
+docker compose exec app php artisan db:seed
+```
+
+#### 3. Access the API
+The API is available at:
+```bash
+http://localhost:8000
+```
+
+
+## 8. Known Limitations & Next Steps
 ### Limitations
 - No real-time eventing (webhooks)
 - No UI dashboard
