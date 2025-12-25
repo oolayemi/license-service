@@ -28,13 +28,13 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy only composer files to leverage Docker cache
-COPY composer.json composer.lock ./
+COPY ../composer.json composer.lock ./
 
 # Install dependencies without running scripts
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Copy full application code
-COPY . .
+COPY .. .
 
 # Now run post-install scripts manually
 RUN php artisan package:discover --ansi
