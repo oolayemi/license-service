@@ -40,10 +40,8 @@ class ApiResponse
 
     /**
      * Return a validation error JSON response.
-     * @param array<string, mixed|null> $errors
-     * @param string|null $message
-     * @param int $status
-     * @return JsonResponse
+     *
+     * @param  array<string, mixed|null>  $errors
      */
     public static function validation(array $errors, ?string $message = 'Validation failed', int $status = 422): JsonResponse
     {

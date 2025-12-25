@@ -11,8 +11,7 @@ class ListLicensesByEmailAction
 {
     /**
      * List all licenses for a customer email within a brand.
-     * @param Brand $brand
-     * @param string $customerEmail
+     *
      * @return array<int, array{
      *     license_key: string,
      *     customer_email: string|null,
@@ -24,7 +23,7 @@ class ListLicensesByEmailAction
      *         max_seats: int|null
      *     }>
      * }>
- */
+     */
     public function execute(Brand $brand, string $customerEmail): array
     {
         Tracer::startSpan('license.list_by_email', [

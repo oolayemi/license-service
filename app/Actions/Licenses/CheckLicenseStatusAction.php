@@ -5,7 +5,6 @@ namespace App\Actions\Licenses;
 use App\Models\LicenseKey;
 use App\Observability\Metrics;
 use App\Observability\Tracer;
-use Illuminate\Support\Collection;
 use Throwable;
 
 class CheckLicenseStatusAction

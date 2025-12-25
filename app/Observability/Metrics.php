@@ -8,10 +8,8 @@ class Metrics
 {
     /**
      * Increment a counter metric.
-     * @param string $name
-     * @param int $value
-     * @param array<int, string>|array<string, mixed> $tags
-     * @return void
+     *
+     * @param  array<int, string>|array<string, mixed>  $tags
      */
     public static function increment(
         string $name,
@@ -28,10 +26,8 @@ class Metrics
 
     /**
      * Record a timing metric (milliseconds).
-     * @param string $name
-     * @param float $milliseconds
-     * @param array<int, string>|array<string, mixed> $tags
-     * @return void
+     *
+     * @param  array<int, string>|array<string, mixed>  $tags
      */
     public static function timing(
         string $name,
@@ -48,9 +44,8 @@ class Metrics
 
     /**
      * Track an event (e.g., license activated, seat exceeded)
-     * @param string $name
-     * @param array<int, string>|array<string, mixed> $payload
-     * @return void
+     *
+     * @param  array<int, string>|array<string, mixed>  $payload
      */
     public static function event(string $name, array $payload = []): void
     {
@@ -59,10 +54,8 @@ class Metrics
 
     /**
      * Record a gauge metric.
-     * @param string $name
-     * @param float|int $value
-     * @param array<int, string>|array<string, mixed> $tags
-     * @return void
+     *
+     * @param  array<int, string>|array<string, mixed>  $tags
      */
     public static function gauge(
         string $name,
