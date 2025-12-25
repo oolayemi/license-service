@@ -86,7 +86,7 @@ class LicenseController extends Controller
 
             return ApiResponse::success([
                 'activation_id' => $activation->id,
-                'deactivated_at' => $activation->deactivated_at->toDateTimeString(),
+                'deactivated_at' => $activation->deactivated_at?->toDateTimeString() ?? null,
             ]);
         } catch (\Throwable $e) {
             return ApiResponse::error($e->getMessage());

@@ -248,7 +248,8 @@ php artisan test
 ./vendor/bin/pint
 ```
 
-#### Code Quality
+#### Code Quality 
+- PHPStan (Level 8)
 ```bash
 composer analyse
 ```
