@@ -16,23 +16,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $code
  * @property bool $is_addon
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Brand $brand
- * @property-read Collection<int, \App\Models\License> $licenses
- * @property-read int|null $licenses_count
- * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereBrandId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereIsAddon($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property Brand $brand
+ * @property Collection<int, License> $licenses
+ *
+ * @method static ProductFactory factory(...$parameters)
  */
 class Product extends Model
 {
@@ -51,7 +38,7 @@ class Product extends Model
     ];
 
     /**
-     * @return BelongsTo<Brand, Product>
+     * @return BelongsTo<Brand, $this>
      */
     public function brand(): BelongsTo
     {
@@ -59,7 +46,7 @@ class Product extends Model
     }
 
     /**
-     * @return HasMany<License, Product>
+     * @return HasMany<License, $this>
      */
     public function licenses(): HasMany
     {

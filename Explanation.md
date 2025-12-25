@@ -248,9 +248,16 @@ php artisan test
 ./vendor/bin/pint
 ```
 
+#### Code Quality
+```bash
+composer analyse
+```
+
 #### CI
 - GitHub Actions
-- Runs Pint + Pest on every PR and commit to main
+- Run Pint + Larastan + Pest on every PR and commit to main
+
+All checks run automatically via GitHub Actions on every pull request and push to `main`.
 
 ## 7. Known Limitations & Next Steps
 ### Limitations

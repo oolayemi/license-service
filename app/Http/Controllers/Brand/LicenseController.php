@@ -15,6 +15,7 @@ class LicenseController extends Controller
 {
     /**
      * Provision a license key and licenses for one or more products.
+     *
      * @return JsonResponse
      */
     public function provision(Request $request, ProvisionLicenseAction $provisionAction)
@@ -56,6 +57,7 @@ class LicenseController extends Controller
 
     /**
      * Change license lifecycle: renew, suspend, resume, cancel
+     *
      * @return JsonResponse
      */
     public function changeLifecycle(
@@ -88,6 +90,7 @@ class LicenseController extends Controller
 
     /**
      * List all licenses by customer email (across all licenses for this brand)
+     *
      * @return JsonResponse
      */
     public function listByEmail(

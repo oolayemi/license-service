@@ -9,6 +9,9 @@ class Tracer
 {
     protected static ?string $traceId = null;
 
+    /**
+     * @var array<string>
+     */
     protected static array $spans = [];
 
     /**
@@ -27,6 +30,9 @@ class Tracer
 
     /**
      * Start a span.
+     * @param string $name
+     * @param array<string, mixed> $context
+     * @return void
      */
     public static function startSpan(string $name, array $context = []): void
     {
@@ -42,6 +48,9 @@ class Tracer
 
     /**
      * End a span.
+     * @param string $name
+     * @param array<string, mixed> $context
+     * @return void
      */
     public static function endSpan(string $name, array $context = []): void
     {
@@ -49,7 +58,7 @@ class Tracer
             return;
         }
 
-        $durationMs = (microtime(true) - self::$spans[$name]) * 1000;
+        $durationMs = (microtime(true) - floatval(self::$spans[$name])) * 1000;
         unset(self::$spans[$name]);
 
         Log::debug('span.end', [
@@ -62,6 +71,8 @@ class Tracer
 
     /**
      * Attach structured context to the trace.
+     * @param array<string, mixed> $context
+     * @return void
      */
     public static function addContext(array $context): void
     {
@@ -73,6 +84,7 @@ class Tracer
 
     /**
      * Get current trace ID.
+     * @return string|null
      */
     public static function traceId(): ?string
     {

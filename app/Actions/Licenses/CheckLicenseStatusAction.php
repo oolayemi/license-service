@@ -18,8 +18,8 @@ class CheckLicenseStatusAction
      * @return array{
      *     license_key: string,
      *     customer_email: string|null,
-     *     licenses: Collection<int, array{
-     *         license_id: int,
+     *     licenses: array<int, array{
+     *         license_id: string,
      *         product_code: string,
      *         product_name: string,
      *         status: string,
@@ -30,6 +30,7 @@ class CheckLicenseStatusAction
      *         is_usable: bool
      *     }>
      * }
+     *
      * @throws Throwable
      */
     public function execute(string $licenseKeyValue): array
@@ -51,13 +52,15 @@ class CheckLicenseStatusAction
                     'product_code' => $license->product->code,
                     'product_name' => $license->product->name,
                     'status' => $license->status->value,
-                    'expires_at' => optional($license->expires_at)->toDateTimeString(),
+                    'expires_at' => $license->expires_at
+                        ? $license->expires_at->toDateTimeString()
+                        : null,
                     'max_seats' => $license->max_seats,
                     'active_seats' => $activeSeats,
                     'remaining_seats' => $remainingSeats,
                     'is_usable' => $license->isUsable(),
                 ];
-            });
+            })->all();
 
             // Metrics
             Metrics::increment('license.status.checked', 1, [

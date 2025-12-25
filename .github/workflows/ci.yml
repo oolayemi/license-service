@@ -26,5 +26,8 @@ jobs:
       - name: Run Pint Linter
         run: ./vendor/bin/pint --test
 
+      - name: Run PHPStan
+        run: composer analyse
+
       - name: Run Tests
         run: php artisan test --coverage

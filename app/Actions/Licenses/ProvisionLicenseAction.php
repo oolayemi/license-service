@@ -20,11 +20,10 @@ class ProvisionLicenseAction
      * Provision licenses for a customer email and one or more products.
      *
      * @param  array<string>  $productCodes  Array of product codes to provision licenses for
-     * @param DateTime|string|null $expiresAt
      *
      * @throws Throwable
      */
-    public function execute(Brand $brand, string $customerEmail, array $productCodes, DateTime|string $expiresAt = null, ?int $maxSeats = null): LicenseKey
+    public function execute(Brand $brand, string $customerEmail, array $productCodes, DateTime|string|null $expiresAt = null, ?int $maxSeats = null): LicenseKey
     {
         Tracer::startSpan('license.provision', [
             'brand_id' => $brand->id,

@@ -7,12 +7,15 @@ use App\Actions\Licenses\CheckLicenseStatusAction;
 use App\Actions\Licenses\DeactivateSeatAction;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LicenseController extends Controller
 {
     /**
      * Activate a license for a specific instance.
+     *
+     * @return JsonResponse
      */
     public function activate(
         Request $request,
@@ -39,12 +42,14 @@ class LicenseController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 
     /**
      * Check license status and entitlements.
+     *
+     * @return JsonResponse
      */
     public function status(
         Request $request,
@@ -59,12 +64,14 @@ class LicenseController extends Controller
 
             return ApiResponse::success($status);
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 
     /**
      * Deactivate seat / activation.
+     *
+     * @return JsonResponse
      */
     public function deactivateSeat(
         Request $request,
@@ -82,7 +89,7 @@ class LicenseController extends Controller
                 'deactivated_at' => $activation->deactivated_at->toDateTimeString(),
             ]);
         } catch (\Throwable $e) {
-            return ApiResponse::error($e->getMessage() ?? 'An unexpected error occurred.');
+            return ApiResponse::error($e->getMessage());
         }
     }
 }
