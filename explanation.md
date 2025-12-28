@@ -264,7 +264,7 @@ composer analyse
 
 All checks run automatically via GitHub Actions on every pull request and push to `main`.
 
-## 7. Docker Architecture
+## 7. Docker Architecture (Optional)
 ### Running the project with Docker
 #### 1. Build and start containers
 ```bash
@@ -274,7 +274,7 @@ docker compose up -d --build
 ```bash
 docker compose exec app php artisan migrate
 ```
-#### (Optional) Seed demo data if available:
+#### (Optional) Seed demo data:
 ```bash
 docker compose exec app php artisan db:seed
 ```
