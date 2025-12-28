@@ -4,7 +4,7 @@ namespace App\Http\Requests\Brand;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateLicenseRequest extends FormRequest
+class ChangeLicenseLifecycleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,8 @@ class UpdateLicenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'action' => 'required|in:renew,suspend,resume,cancel',
+            'renew_days' => 'nullable|integer|min:1',
         ];
     }
 }

@@ -7,6 +7,8 @@ use App\Actions\Licenses\CheckLicenseStatusAction;
 use App\Actions\Licenses\DeactivateSeatAction;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\ActivateLicenseRequest;
+use App\Http\Requests\Product\CheckLicenseStatusRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,14 +20,9 @@ class LicenseController extends Controller
      * @return JsonResponse
      */
     public function activate(
-        Request $request,
+        ActivateLicenseRequest $request,
         ActivateLicenseAction $action
     ) {
-        $request->validate([
-            'license_key' => 'required|string',
-            'product_code' => 'required|string',
-            'instance_id' => 'nullable|string',
-        ]);
 
         try {
 
@@ -52,13 +49,9 @@ class LicenseController extends Controller
      * @return JsonResponse
      */
     public function status(
-        Request $request,
+        CheckLicenseStatusRequest $request,
         CheckLicenseStatusAction $action
     ) {
-        $request->validate([
-            'license_key' => 'required|string',
-        ]);
-
         try {
             $status = $action->execute($request->input('license_key'));
 

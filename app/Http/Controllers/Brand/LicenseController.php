@@ -7,6 +7,8 @@ use App\Actions\Licenses\ListLicensesByEmailAction;
 use App\Actions\Licenses\ProvisionLicenseAction;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Brand\ChangeLicenseLifecycleRequest;
+use App\Http\Requests\Brand\ProvisionLicenseRequest;
 use App\Models\License;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,15 +20,8 @@ class LicenseController extends Controller
      *
      * @return JsonResponse
      */
-    public function provision(Request $request, ProvisionLicenseAction $provisionAction)
+    public function provision(ProvisionLicenseRequest $request, ProvisionLicenseAction $provisionAction)
     {
-        $request->validate([
-            'customer_email' => 'required|email',
-            'product_codes' => 'required|array',
-            'expires_at' => 'nullable|date',
-            'max_seats' => 'nullable|integer|min:1',
-        ]);
-
         try {
 
             $brand = $request->attributes->get('brand'); // this comes from the brand api token middleware
@@ -61,14 +56,10 @@ class LicenseController extends Controller
      * @return JsonResponse
      */
     public function changeLifecycle(
-        Request $request,
+        ChangeLicenseLifecycleRequest $request,
         License $license,
         ChangeLicenseLifecycleAction $action
     ) {
-        $request->validate([
-            'action' => 'required|in:renew,suspend,resume,cancel',
-            'renew_days' => 'nullable|integer|min:1',
-        ]);
 
         try {
             $updatedLicense = $action->execute(

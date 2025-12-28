@@ -78,6 +78,9 @@ This ensures:
 - LicenseKey → Licenses
 - License → Activations
 
+### 2.4 Database Models Schema
+![img.png](database_schema.png)
+
 ---
 
 ### 2.4 API Design

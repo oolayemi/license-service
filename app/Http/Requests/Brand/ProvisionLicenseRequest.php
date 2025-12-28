@@ -11,7 +11,7 @@ class ProvisionLicenseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class ProvisionLicenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'customer_email' => 'required|email',
+            'product_codes' => 'required|array',
+            'expires_at' => 'nullable|date',
+            'max_seats' => 'nullable|integer|min:1',
         ];
     }
 }

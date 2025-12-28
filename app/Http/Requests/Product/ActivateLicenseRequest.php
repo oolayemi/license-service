@@ -11,7 +11,7 @@ class ActivateLicenseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class ActivateLicenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'license_key' => 'required|string',
+            'product_code' => 'required|string',
+            'instance_id' => 'nullable|string',
         ];
     }
 }
