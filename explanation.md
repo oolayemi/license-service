@@ -183,7 +183,6 @@ All **recommended core stories** are fully implemented.
 - PHP 8.2+
 - Composer
 - PostgreSQL (or MySQL)
-- Node.js (optional)
 
 ---
 
