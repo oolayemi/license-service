@@ -35,7 +35,7 @@ class Tracer
      */
     public static function startSpan(string $name, array $context = []): void
     {
-        //        self::traceId() ?? self::startTrace();
+        self::traceId() ?? self::startTrace();
         self::$spans[$name] = microtime(true);
 
         Log::debug('span.start', [
