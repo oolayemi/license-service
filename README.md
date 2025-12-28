@@ -15,4 +15,4 @@ For a complete explanation of the architecture, design decisions, trade-offs, an
 ## Getting Started
 
 1. Clone the repository
-2. Follow the setup instructions in [Explanation.md](./explanation) to run locally, seed the database, and test the APIs.
+2. Follow the setup instructions in [Explanation.md](./explanation.md) to run locally, seed the database, and test the APIs.
